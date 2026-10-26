@@ -44,6 +44,7 @@ import benchmark_cnf as BC  # noqa: E402  (strict original-formula validation)
 
 IO_DEADLINE_S = 30.0        # Unix signal deadline around each official bus call
 POLL_S = 0.05
+LIT_PAGE = 8                # literal-store page size (R_LITPAGE) of the frozen candidate config
 CLK_HZ = 50_000_000         # device clock; cycles beyond timeout_s * CLK_HZ
                             # are outside the solve budget, never success
 RECOVERY_BUDGET_S = 120.0
@@ -464,7 +465,7 @@ def synthetic_recovery(bus, host, drv, emit=None, mono=time.monotonic,
             emit("recovery_done", **out)
             return out
         out["ctrl_after_abort"] = bus.read(drv.D.R_CTRL)
-        img = host.build_images(1, [[1]], host.pigweed(host.Config(lit_page=16)))
+        img = host.build_images(1, [[1]], host.pigweed(host.Config(lit_page=LIT_PAGE)))
         drv.check_caps(bus, img)
         if mono() - t0 > budget_s:
             out["reason"] = "recovery budget exhausted before load"
@@ -537,13 +538,13 @@ def qualify_session(bus, host, drv, fixture_dir=None, pilot_cnfs=None,
     parent's 600 s stage."""
     emit = emit or (lambda *a, **k: None)
     out = {"ok": False, "sequence": [], "abort_recovery": None}
-    img0 = host.build_images(1, [[1]], host.pigweed(host.Config(lit_page=16)))
+    img0 = host.build_images(1, [[1]], host.pigweed(host.Config(lit_page=LIT_PAGE)))
     drv.check_caps(bus, img0)                    # exact magic/version/caps
 
     for nv, clauses, want in QUALIFY_FORMULAS:
         t = mono()
         img = host.build_images(nv, clauses,
-                                host.pigweed(host.Config(lit_page=16)))
+                                host.pigweed(host.Config(lit_page=LIT_PAGE)))
         drv.abort(bus)
         drv.load(bus, img)
         t_go = mono()                            # window opens at GO
@@ -620,7 +621,7 @@ def _demonstrate_active_abort(bus, host, drv, fixture_dir, pilot_cnfs,
         try:
             nv, clauses = host.parse_dimacs(path)
             img = host.build_images(
-                nv, clauses, host.pigweed(host.Config(lit_page=16)))
+                nv, clauses, host.pigweed(host.Config(lit_page=LIT_PAGE)))
             drv.abort(bus)
             drv.load(bus, img)
             t_go = mono()
@@ -719,7 +720,7 @@ def child_main(job_path: str) -> int:
             emit("parsed", elapsed_s=parse_s)
             t = time.monotonic()
             img = host.build_images(
-                nv, clauses, host.pigweed(host.Config(lit_page=16)))
+                nv, clauses, host.pigweed(host.Config(lit_page=LIT_PAGE)))
             encode_s = time.monotonic() - t
             emit("encoded", elapsed_s=encode_s)
             original = BC.parse_dimacs(open(cnf_path, encoding="utf-8").read())

@@ -36,6 +36,13 @@ Reasoning cloud FPGA platform. The repository contains:
 - **Full write-up:** `FPGA_Readiness_Plan.md` §7–8 and
   `FPGA_Extension_Uncertified20_Report.md`.
 
+**Baseline from 2026-10-26:** PigWeedSAT `679c136` (8K clauses, 24K-word
+clause and literal stores) at P=8. It loads 120 of 210 instances (S 19,
+S-tight 71, M-low 30, M-high 0), about 100 of them CPU-certified. The campaigns
+above used the earlier `27e4de5` at P=16. In the golden model, the new
+baseline removes every learned-clause memory error on the 22 eligible
+instances Kissat solves in under 10 s; it has not yet run on boards.
+
 No competition score and no CPU-vs-FPGA speedup are claimed: the two use
 different timing contracts.
 
@@ -63,7 +70,7 @@ different timing contracts.
 git clone git@github.com:mhidalg3/PorcoBench.git
 # the organizer expects the candidate as a sibling directory named PigWeedSAT
 git clone git@github.com:cscaff/PigWeedSAT.git
-git -C PigWeedSAT checkout 27e4de5e2868ddf366163a99466c07bbc1149b31
+git -C PigWeedSAT checkout 679c1364fa8daf8fcc5f47348b932dd118dbea78
 cd PorcoBench
 
 # 1. corpus: download from GBD and verify every byte against manifest.csv

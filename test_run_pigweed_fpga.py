@@ -206,7 +206,7 @@ def make_bus(accel):
 
 def tiny_img(clauses=None, nv=1):
     return HOST.build_images(nv, clauses if clauses is not None else [[1]],
-                             HOST.pigweed(HOST.Config(lit_page=16)))
+                             HOST.pigweed(HOST.Config(lit_page=W.LIT_PAGE)))
 
 
 # ---------------------------------------------------------------------------

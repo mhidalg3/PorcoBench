@@ -10,8 +10,8 @@ Commands (from the repository root, venv .venv-fpga):
     run_pigweed_fpga.py report --out RUN
 
 Default contract: manifest of 210 instances, frozen candidate snapshot
-(PigWeedSAT clone HEAD 27e4de5e..., byte-identical, clean checkout), cfg =
-H.pigweed(H.Config(lit_page=16)), 50 MHz system clock and timing target,
+(PigWeedSAT clone HEAD 679c1364..., byte-identical, clean checkout), cfg =
+H.pigweed(H.Config(lit_page=8)), 50 MHz system clock and timing target,
 1,000 s host solve deadline, three repetitions per fresh-eligible instance;
 prepare's campaign options change the deadline, repetitions, id scope and
 CPU evidence sources and are recorded in run.json and the run identity.
@@ -59,7 +59,7 @@ SYS_CLK_HZ = 50_000_000
 TIMING_TARGET_MHZ = 50.0
 SOLVE_TIMEOUT_S = 1000.0
 REPETITIONS = 3
-LIT_PAGE = 16
+LIT_PAGE = WK.LIT_PAGE      # one source of truth: the worker encodes with it too
 POLL_S = 0.05
 
 PILOT_IDS = ["MRB0-005", "MRB0-011", "MRB0-017",
@@ -68,7 +68,7 @@ PILOT_IDS = ["MRB0-005", "MRB0-011", "MRB0-017",
 DEFAULT_MANIFEST = os.path.join(HERE, "manifest.csv")
 DEFAULT_CPU_RUN = os.path.join(HERE, "calibration", "cpu-v0")
 CANDIDATE_SRC = os.path.join(ROOT, "PigWeedSAT")
-CANDIDATE_GIT_HEAD = "27e4de5e2868ddf366163a99466c07bbc1149b31"
+CANDIDATE_GIT_HEAD = "679c1364fa8daf8fcc5f47348b932dd118dbea78"
 CANDIDATE_PATHS = ("design.py", "satlat/", "LICENSE", "NOTICE",
                    "SAT_test_cases/")
 QUAL_FIXTURES = [
@@ -2430,7 +2430,7 @@ def write_report_md(run_dir: Path, summary: dict) -> None:
         f"Generated {summary['generated_utc']}.", "",
         "## Contract", "",
         "- Unmodified PigWeedSAT candidate (frozen snapshot in `candidate/`), "
-        "cfg `H.pigweed(H.Config(lit_page=16))`, P=16.",
+        f"cfg `H.pigweed(H.Config(lit_page={LIT_PAGE}))`, P={LIT_PAGE}.",
         f"- 50 MHz system clock and timing target; "
         f"{cp['solve_timeout_s']:,.0f} s **host** solve deadline; "
         f"{reps} repetition{'s' if reps != 1 else ''}; host-observed timing "
